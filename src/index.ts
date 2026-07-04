@@ -1,8 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import * as path from "path";
 import { z } from "zod";
-import { fileURLToPath } from 'url';
 import { runInAe } from "./aeRunner.js";
 
 // Create an MCP server
@@ -10,14 +8,6 @@ const server = new McpServer({
   name: "AfterEffectsServer",
   version: "1.0.0"
 });
-
-// ES Modules replacement for __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Define paths
-const SCRIPTS_DIR = path.join(__dirname, "scripts");
-const TEMP_DIR = path.join(__dirname, "temp");
 
 // Add a resource to expose project compositions
 server.resource(
@@ -68,7 +58,6 @@ server.tool(
       "setLayerExpression",
       "applyEffect",
       "applyEffectTemplate",
-      "test-animation",
       "bridgeTestEffects",
       "createCamera",
       "batchSetLayerProperties",
@@ -635,8 +624,6 @@ server.tool(
 // Start the MCP server
 async function main() {
   console.error("After Effects MCP Server starting...");
-  console.error(`Scripts directory: ${SCRIPTS_DIR}`);
-  console.error(`Temp directory: ${TEMP_DIR}`);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
