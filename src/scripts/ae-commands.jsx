@@ -863,7 +863,7 @@ function applyEffectSettings(effect, settings) {
                     property.setValue(settings[propName]);
                 }
             } catch (e) {
-                $.writeln("Error setting effect property '" + propName + "': " + e.toString());
+                // continue — error setting effect property
             }
         }
     }
@@ -895,6 +895,7 @@ function applyEffect(args) {
         }
 
         var effectResult;
+        var effect;
 
         if (presetPath) {
             var presetFile = new File(presetPath);
@@ -910,7 +911,7 @@ function applyEffect(args) {
             };
         }
         else if (effectMatchName) {
-            var effect = layer.Effects.addProperty(effectMatchName);
+            effect = layer.Effects.addProperty(effectMatchName);
             effectResult = {
                 type: "effect",
                 name: effect.name,
@@ -921,7 +922,7 @@ function applyEffect(args) {
             applyEffectSettings(effect, effectSettings);
         }
         else {
-            var effect = layer.Effects.addProperty(effectName);
+            effect = layer.Effects.addProperty(effectName);
             effectResult = {
                 type: "effect",
                 name: effect.name,
@@ -1078,9 +1079,10 @@ function applyEffectTemplate(args) {
         }
 
         var appliedEffects = [];
+        var effect;
 
         if (template.effectMatchName) {
-            var effect = layer.Effects.addProperty(template.effectMatchName);
+            effect = layer.Effects.addProperty(template.effectMatchName);
 
             var tSettings = template.settings || {};
             for (var propName in tSettings) {
@@ -1090,7 +1092,7 @@ function applyEffectTemplate(args) {
                         property.setValue(tSettings[propName]);
                     }
                 } catch (e) {
-                    $.writeln("Warning: Could not set " + propName + " on effect " + effect.name + ": " + e);
+                    // continue — error setting property
                 }
             }
 
@@ -1101,7 +1103,7 @@ function applyEffectTemplate(args) {
         } else if (template.effects) {
             for (var i = 0; i < template.effects.length; i++) {
                 var effectData = template.effects[i];
-                var effect = layer.Effects.addProperty(effectData.effectMatchName);
+                effect = layer.Effects.addProperty(effectData.effectMatchName);
 
                 var eSettings = effectData.settings || {};
                 for (var propName in eSettings) {
@@ -1111,7 +1113,7 @@ function applyEffectTemplate(args) {
                             property.setValue(eSettings[propName]);
                         }
                     } catch (e) {
-                        $.writeln("Warning: Could not set " + propName + " on effect " + effect.name + ": " + e);
+                        // continue — error setting property
                     }
                 }
 
