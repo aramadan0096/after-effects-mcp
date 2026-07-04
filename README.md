@@ -191,9 +191,44 @@ You can animate layers with:
 
 ### 🧩 Project Structure
 
-- `src/index.ts`: MCP server implementation
-- `src/scripts/mcp-bridge-auto.jsx`: Main After Effects panel script
-- `install-bridge.js`: Script to install the panel in After Effects
+- `src/index.ts`: MCP server implementation (tool definitions; every tool delegates to `runInAe`)
+- `src/aeRunner.ts`: the transport — writes a wrapper `.jsx`, launches `AfterFX.exe -r`, polls for the correlation-id result file
+- `src/aePath.ts`: locates `AfterFX.exe` (honors `AE_PATH`, then scans install years)
+- `src/scripts/ae-commands.jsx`: ES3 command library (`aeExecuteCommand` dispatch, undo-grouped)
+- `src/scripts/mcp-bridge-auto.jsx`: legacy bridge-panel shim (optional; not needed for the `-r` transport)
+- `install-bridge.js`: installs the legacy panel + command library into After Effects
+
+### 📚 Using aeRunner as a library (no MCP session)
+
+The transport is importable directly from Node — useful for scripts, CI, or an
+agent session where the MCP tools aren't registered:
+
+```js
+import { runInAe } from "./build/aeRunner.js";
+
+// Named command from ae-commands.jsx
+const info = await runInAe("getProjectInfo", {});
+
+// Arbitrary ExtendScript — the LAST EXPRESSION is the return value
+const version = await runInAe("app-version", {}, {
+  rawScript: "app.version",
+  timeoutMs: 60000,
+});
+```
+
+Signature: `runInAe(command, args, opts)` — `command` is a label when
+`opts.rawScript` is set. `opts`: `rawScript`, `timeoutMs` (default 30 s),
+`aePath`. JSON-looking string results are parsed for you.
+
+Tips learned in production use:
+
+- **Multi-line rawScript**: the script is written to a temp file and
+  `$.evalFile`'d, so real newlines are fine — but avoid hand-escaping `\n`
+  inside nested quoting layers (shell → JS → ExtendScript); build strings with
+  `String.fromCharCode(10)` or join an array of lines instead.
+- After Effects must already be running; `-r` executes in the live instance.
+- Results correlate by UUID under `%TEMP%/ae-mcp` — safe to run calls back to
+  back, but AE executes them serially.
 
 ### 📦 Building the Project
 
