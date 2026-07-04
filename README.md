@@ -5,7 +5,9 @@
 ![License](https://img.shields.io/github/license/Dakkshin/after-effects-mcp)
 ![Platform](https://img.shields.io/badge/platform-after%20effects-blue)
 
-✨ A Model Context Protocol (MCP) server for Adobe After Effects that enables AI assistants and other applications to control After Effects through a standardized protocol.
+✨ **OpticXI fork** of the Model Context Protocol (MCP) server for Adobe After Effects. Enables AI assistants and applications to control After Effects through a standardized protocol.
+
+**Fork changes:** The `run-extendscript` tool runs ExtendScript directly via `AfterFX.exe -r`, without requiring a ScriptUI bridge panel.
 
 <a href="https://glama.ai/mcp/servers/@Dakkshin/after-effects-mcp">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@Dakkshin/after-effects-mcp/badge" alt="mcp-after-effects MCP server" />
@@ -61,44 +63,32 @@
 ## ⚙️ Setup Instructions
 
 ### 🛠 Prerequisites
-- Adobe After Effects (2022 or later)
+- Adobe After Effects (2022 or later) running with *Allow Scripts to Write Files and Access Network* enabled
 - Node.js (v14 or later)
 - npm or yarn package manager
+- Optional: `AE_PATH` environment variable pointing to your After Effects installation (auto-detected if not set)
 
 ### 📥 Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Dakkshin/after-effects-mcp.git
+   git clone https://github.com/opticxi-fork/after-effects-mcp.git
    cd after-effects-mcp
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
 3. **Build the project**
    ```bash
    npm run build
-   # or
-   yarn build
    ```
-
-4. **Install the After Effects panel**
-   ```bash
-   npm run install-bridge
-   # or
-   yarn install-bridge
-   ```
-   This will copy the necessary scripts to your After Effects installation.
 
 ### 🔧 Update MCP Config
 
-#### Option 1: Using .mcp.json (Recommended for Claude Code)
-The repository includes a `.mcp.json` file for easy configuration. Copy or reference it in your MCP settings:
+Configure your MCP client (Claude Code, Cursor, etc.) with the server. Example for `.mcp.json`:
 
 ```json
 {
@@ -111,35 +101,16 @@ The repository includes a `.mcp.json` file for easy configuration. Copy or refer
 }
 ```
 
-#### Option 2: Manual Configuration
-Go to your client (e.g., Claude or Cursor) and update your config file:
-
-```json
-{
-  "mcpServers": {
-    "AfterEffectsMCP": {
-      "command": "node",
-      "args": ["C:\\Users\\Dakkshin\\after-effects-mcp\\build\\index.js"]
-    }
-  }
-}
-```
-
 ### ▶️ Running the Server
 
-1. **Start the MCP server**
+1. **Ensure After Effects is running** — the `run-extendscript` tool communicates with your live instance via `AfterFX.exe -r`. No bridge panel needed.
+
+2. **Start the MCP server**
    ```bash
    npm start
-   # or
-   yarn start
    ```
 
-2. **Open After Effects**
-
-3. **Open the MCP Bridge Auto panel**
-   - In After Effects, go to Window > mcp-bridge-auto.jsx
-   - The panel will automatically check for commands every few seconds
-   - Make sure the "Auto-run commands" checkbox is enabled
+3. **Commands run immediately** — results are returned synchronously. The server writes temporary files to `%TEMP%/ae-mcp/` for the `AfterFX -r` protocol; you can ignore this directory.
 
 ## 🚀 Usage Guide
 
@@ -201,6 +172,7 @@ You can animate layers with:
 
 | Command                     | Description                            |
 |-----------------------------|----------------------------------------|
+| `run-extendscript`          | Run arbitrary ExtendScript and return result. **⚠️ Executes arbitrary script on your machine — only wire into agents you trust.** |
 | `create-composition`        | Create a new composition               |
 | `run-script`                | Run a JS script inside AE              |
 | `get-results`               | Get script results                     |

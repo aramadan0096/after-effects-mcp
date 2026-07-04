@@ -621,6 +621,25 @@ server.tool(
   }
 );
 
+// Add the run-extendscript tool
+server.tool(
+  "run-extendscript",
+  "Run arbitrary ExtendScript in the running After Effects and return String(result). " +
+  "Local automation tool — the script runs with full host access on this machine.",
+  {
+    script: z.string().describe("ExtendScript expression or IIFE, e.g. app.project.numItems"),
+    timeoutMs: z.number().optional()
+  },
+  async ({ script, timeoutMs }) => {
+    try {
+      const result = await runInAe("runScript", {}, { rawScript: script, timeoutMs: timeoutMs ?? 30_000 });
+      return { content: [{ type: "text", text: JSON.stringify(result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: `ERROR: ${(e as Error).message}` }], isError: true };
+    }
+  }
+);
+
 // Start the MCP server
 async function main() {
   console.error("After Effects MCP Server starting...");
