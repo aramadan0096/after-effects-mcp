@@ -92,6 +92,7 @@ describe("runInAe", () => {
     const dir = join(tmpdir(), "ae-mcp"); mkdirSync(dir, { recursive: true });
     const uglyScript = 'var f = new File("C:\\\\Users\\\\foo\\\\bar.jsx"); f.open("r");';
     let capturedScriptPath: string | undefined;
+    let capturedScriptContent = "";
     const fakeSpawn = ((_cmd: string, argv: string[]) => {
       const wrapperPath = argv[argv.indexOf("-r") + 1];
       const wrapperSrc = readFileSync(wrapperPath, "utf8");
@@ -101,6 +102,7 @@ describe("runInAe", () => {
       // Unescape the path from the ES3 literal
       if (m) {
         capturedScriptPath = m[1].replace(/\\\\/g, "\\").replace(/\\"/g, '"');
+        capturedScriptContent = readFileSync(capturedScriptPath, "utf8");
       }
       setTimeout(() => writeFileSync(resultPath!,
         JSON.stringify({ id: "raw", status: "success", command: "runScript", result: "ok", error: null })), 50);
@@ -112,11 +114,6 @@ describe("runInAe", () => {
     } as any);
     // The script file must have been written and must be byte-identical to uglyScript
     expect(capturedScriptPath).toBeDefined();
-    // File is cleaned up after resolve — read was done in fakeSpawn before cleanup
-    // Instead verify the wrapper does NOT contain any fragment of the raw script text
-    const wrapperDir = join(tmpdir(), "ae-mcp");
-    // Wrapper is already deleted; confirm the script content was never embedded by checking
-    // capturedScriptPath was set (proves $.evalFile path was present)
-    expect(capturedScriptPath).toContain("script-raw.jsx");
+    expect(capturedScriptContent).toBe(uglyScript);
   });
 });

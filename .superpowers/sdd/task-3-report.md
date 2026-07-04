@@ -96,3 +96,29 @@ Updated existing test: `rawScript mode evals the script instead of dispatching a
   build/index.js  27.1kb
 Done in 3ms
 ```
+
+## Fix round 2
+
+### Problem fixed
+
+The rawScript byte-identical test (line 91–121, `test/aeRunner.test.ts`) claimed to verify that the script file content was byte-identical to the input `uglyScript`, but it never actually read the file. It only captured the path and validated that the path existed, leaving the actual content assertion missing.
+
+### Fix applied
+
+Inside the `fakeSpawn` callback (which runs while the script file is still on disk, before cleanup):
+1. Declared `let capturedScriptContent = "";` alongside `capturedScriptPath`
+2. After unescaping the path, added `capturedScriptContent = readFileSync(capturedScriptPath, "utf8");`
+3. After `runInAe` resolves, replaced the obsolete path-only assertions with `expect(capturedScriptContent).toBe(uglyScript);`
+
+### Test run output
+
+```
+ RUN  v4.1.9 E:/Scripts/OpticXI/after-effects-mcp
+
+ Test Files  3 passed (3)
+      Tests  13 passed (13)
+   Start at  07:35:10
+   Duration  1.76s (transform 79ms, setup 0ms, import 176ms, tests 1.53s, environment 0ms)
+```
+
+All 13 tests pass — including the now-correct byte-identical assertion.
