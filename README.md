@@ -114,7 +114,7 @@ Configure your MCP client (Claude Code, Cursor, etc.) with the server. Example f
 
 ## 🚀 Usage Guide
 
-Once you have the server running and the MCP Bridge panel open in After Effects, you can control After Effects through the MCP protocol. This allows AI assistants or custom applications to send commands to After Effects.
+Once After Effects is running and the MCP server is started, AI assistants and custom applications can control After Effects through the MCP protocol.
 
 ### 📘 Creating Compositions
 
@@ -175,7 +175,6 @@ You can animate layers with:
 | `run-extendscript`          | Run arbitrary ExtendScript and return result. **⚠️ Executes arbitrary script on your machine — only wire into agents you trust.** |
 | `create-composition`        | Create a new composition               |
 | `run-script`                | Run a JS script inside AE              |
-| `get-results`               | Get script results                     |
 | `get-help`                  | Help for available commands            |
 | `setLayerKeyframe`          | Add keyframe to layer property         |
 | `setLayerExpression`        | Add/remove expressions from properties|
