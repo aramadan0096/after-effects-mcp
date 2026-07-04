@@ -169,9 +169,8 @@ server.tool(
 
 To use this integration with After Effects, follow these steps:
 
- 1. **Install the scripts in After Effects**
-   - Run \`node install-bridge.js\` with administrator privileges
-   - This copies the necessary scripts to your After Effects installation
+ 1. **Open After Effects** — the \`run-extendscript\` tool communicates via \`AfterFX.exe -r\`; no bridge panel is required for this transport.
+   - Optional (legacy panel fallback): run \`node install-bridge.js\` to install the ScriptUI bridge panel — the -r transport needs no panel.
 
 2. **Open After Effects**
    - Launch Adobe After Effects

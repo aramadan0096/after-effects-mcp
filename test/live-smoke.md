@@ -4,7 +4,7 @@
 **Branch:** feat/opticxi-improvements  
 **AE process PID:** 57976  
 **AE version:** 26.2.1x2 (After Effects 2026)  
-**Build:** `build/index.js` + `build/aeRunner.js` rebuilt immediately before test
+**Build:** `build/index.js` + `build/aeRunner.js` rebuilt immediately before test (`npm run build` now emits both bundles)
 
 ## Procedure
 

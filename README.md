@@ -72,7 +72,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/opticxi-fork/after-effects-mcp.git
+   git clone https://github.com/aramadan0096/after-effects-mcp.git
    cd after-effects-mcp
    ```
 

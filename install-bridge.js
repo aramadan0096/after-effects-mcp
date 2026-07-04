@@ -55,14 +55,21 @@ if (!afterEffectsPath) {
 
 // Define source and destination paths
 const sourceScript = path.join(__dirname, 'build', 'scripts', 'mcp-bridge-auto.jsx');
+const sourceLib = path.join(__dirname, 'build', 'scripts', 'ae-commands.jsx');
 const destinationFolder = isMac
   ? path.join(afterEffectsPath, 'Scripts', 'ScriptUI Panels')
   : path.join(afterEffectsPath, 'Support Files', 'Scripts', 'ScriptUI Panels');
 const destinationScript = path.join(destinationFolder, 'mcp-bridge-auto.jsx');
+const destinationLib = path.join(destinationFolder, 'ae-commands.jsx');
 
-// Ensure source script exists
+// Ensure source scripts exist
 if (!fs.existsSync(sourceScript)) {
   console.error(`Error: Source script not found at ${sourceScript}`);
+  console.error('Please run "npm run build" first to generate the script.');
+  process.exit(1);
+}
+if (!fs.existsSync(sourceLib)) {
+  console.error(`Error: Library script not found at ${sourceLib}`);
   console.error('Please run "npm run build" first to generate the script.');
   process.exit(1);
 }
@@ -86,14 +93,16 @@ try {
     // On Mac, try direct copy first, then sudo if needed
     try {
       fs.copyFileSync(sourceScript, destinationScript);
+      fs.copyFileSync(sourceLib, destinationLib);
     } catch {
       // If direct copy fails, try with sudo
       execSync(`sudo cp "${sourceScript}" "${destinationScript}"`, { stdio: 'inherit' });
+      execSync(`sudo cp "${sourceLib}" "${destinationLib}"`, { stdio: 'inherit' });
     }
   } else {
     // Try to use PowerShell with elevated privileges on Windows
     const command = `
-      Start-Process PowerShell -Verb RunAs -ArgumentList "-Command Copy-Item -Path '${sourceScript.replace(/\\/g, '\\\\')}' -Destination '${destinationScript.replace(/\\/g, '\\\\')}' -Force"
+      Start-Process PowerShell -Verb RunAs -ArgumentList "-Command Copy-Item -Path '${sourceScript.replace(/\\/g, '\\\\')}' -Destination '${destinationScript.replace(/\\/g, '\\\\')}' -Force; Copy-Item -Path '${sourceLib.replace(/\\/g, '\\\\')}' -Destination '${destinationLib.replace(/\\/g, '\\\\')}' -Force"
     `;
     execSync(`powershell -Command "${command}"`, { stdio: 'inherit' });
   }
@@ -113,7 +122,9 @@ try {
   console.error(`Error installing script: ${error.message}`);
   console.error('\nPlease try manual installation:');
   console.error(`1. Copy: ${sourceScript}`);
-  console.error(`2. To: ${destinationScript}`);
+  console.error(`   To:   ${destinationScript}`);
+  console.error(`2. Copy: ${sourceLib}`);
+  console.error(`   To:   ${destinationLib}`);
   if (isMac) {
     console.error('3. You may need to run with sudo or copy manually via Finder');
   } else {

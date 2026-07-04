@@ -46,7 +46,7 @@ export function buildWrapper(opts: {
 // RESULT:${opts.resultPath}:END
 (function () {
     function __jsonStr(s) {
-        return '"' + String(s).replace(/\\\\/g, "\\\\\\\\").replace(/"/g, '\\\\"').replace(/\\r?\\n/g, "\\\\n") + '"';
+        return '"' + String(s).replace(/\\\\/g, "\\\\\\\\").replace(/"/g, '\\\\"').replace(/\\r?\\n/g, "\\\\n").replace(/\\r/g, "\\\\r").replace(/\\t/g, "\\\\t") + '"';
     }
     var __payload = null, __err = null;
     try {
@@ -129,7 +129,11 @@ export async function runInAe(
       ? JSON.parse(parsed.result)
       : parsed.result;
   }
-  rmSync(wrapperPath, { force: true });
+  // On timeout, clean up the result stub (best-effort) and the rawScript temp file.
+  // The wrapper file is intentionally left for the OS temp cleaner: AE may still be
+  // reading it at this point, and deleting an open file on Windows would silently
+  // corrupt the in-flight read.
+  rmSync(resultPath, { force: true });
   if (scriptPath !== undefined) rmSync(scriptPath, { force: true });
   throw new Error(`AE command '${command}' timed out after ${timeoutMs}ms — is After Effects running?`);
 }

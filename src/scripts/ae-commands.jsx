@@ -1328,26 +1328,31 @@ function bridgeTestEffects(args) {
 
 // Single entry point used by both the -r wrapper and the legacy bridge panel.
 function aeExecuteCommand(command, args) {
-    switch (command) {
-        case "getProjectInfo": return getProjectInfo(args);
-        case "listCompositions": return listCompositions(args);
-        case "getLayerInfo": return getLayerInfo(args);
-        case "createComposition": return createComposition(args);
-        case "createTextLayer": return createTextLayer(args);
-        case "createShapeLayer": return createShapeLayer(args);
-        case "createSolidLayer": return createSolidLayer(args);
-        case "setLayerProperties": return setLayerProperties(args);
-        case "setLayerKeyframe": return setLayerKeyframe(args.compIndex, args.layerIndex, args.propertyName, args.timeInSeconds, args.value);
-        case "setLayerExpression": return setLayerExpression(args.compIndex, args.layerIndex, args.propertyName, args.expressionString);
-        case "applyEffect": return applyEffect(args);
-        case "applyEffectTemplate": return applyEffectTemplate(args);
-        case "createCamera": return createCamera(args);
-        case "batchSetLayerProperties": return batchSetLayerProperties(args);
-        case "setCompositionProperties": return setCompositionProperties(args);
-        case "duplicateLayer": return duplicateLayer(args);
-        case "deleteLayer": return deleteLayer(args);
-        case "setLayerMask": return setLayerMask(args);
-        case "bridgeTestEffects": return bridgeTestEffects(args);
-        default: throw new Error("Unknown command: " + command);
+    app.beginUndoGroup("ae-mcp: " + command);
+    try {
+        switch (command) {
+            case "getProjectInfo": return getProjectInfo(args);
+            case "listCompositions": return listCompositions(args);
+            case "getLayerInfo": return getLayerInfo(args);
+            case "createComposition": return createComposition(args);
+            case "createTextLayer": return createTextLayer(args);
+            case "createShapeLayer": return createShapeLayer(args);
+            case "createSolidLayer": return createSolidLayer(args);
+            case "setLayerProperties": return setLayerProperties(args);
+            case "setLayerKeyframe": return setLayerKeyframe(args.compIndex, args.layerIndex, args.propertyName, args.timeInSeconds, args.value);
+            case "setLayerExpression": return setLayerExpression(args.compIndex, args.layerIndex, args.propertyName, args.expressionString);
+            case "applyEffect": return applyEffect(args);
+            case "applyEffectTemplate": return applyEffectTemplate(args);
+            case "createCamera": return createCamera(args);
+            case "batchSetLayerProperties": return batchSetLayerProperties(args);
+            case "setCompositionProperties": return setCompositionProperties(args);
+            case "duplicateLayer": return duplicateLayer(args);
+            case "deleteLayer": return deleteLayer(args);
+            case "setLayerMask": return setLayerMask(args);
+            case "bridgeTestEffects": return bridgeTestEffects(args);
+            default: throw new Error("Unknown command: " + command);
+        }
+    } finally {
+        app.endUndoGroup();
     }
 }
